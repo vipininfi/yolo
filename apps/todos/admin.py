@@ -1,9 +1,9 @@
 from django.contrib import admin
-from apps.todos.models import Todo
+from .models import Todo
 
 
 @admin.register(Todo)
 class TodoAdmin(admin.ModelAdmin):
-    list_display = ("title", "completed", "created_at")
+    list_display = ("id", "title", "completed", "priority", "due_date", "created_at")
+    list_filter = ("completed", "priority", "due_date")
     search_fields = ("title", "description")
-    list_filter = ("completed",)

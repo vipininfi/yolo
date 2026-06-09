@@ -2,6 +2,9 @@
 :root {
   --radius: 10px;
   --shadow-sm: 0 1px 3px rgba(0,0,0,.06);
+  --color-high: #ef4444; /* red */
+  --color-normal: #f59e0b; /* amber */
+  --color-low: #10b981; /* green */
 }
 
 .todo-card {
@@ -14,9 +17,34 @@
   transform: translateY(-2px);
 }
 
-.badge-completed { background-color: #198754; }
+.badge-priority-high {
+  background-color: var(--color-high);
+  color: #fff;
+}
+.badge-priority-normal {
+  background-color: var(--color-normal);
+  color: #fff;
+}
+.badge-priority-low {
+  background-color: var(--color-low);
+  color: #fff;
+}
+
+.todo-overdue {
+  background: linear-gradient(90deg, rgba(255,235,238,0.6), transparent);
+  border-left: 4px solid rgba(239,68,68,0.16);
+}
+
 .empty-state { text-align: center; padding: 2.5rem 1rem; color: #6c757d; }
 
-@media (max-width: 576px) {
-  .todo-card { padding: .75rem; }
+.bulk-toolbar { padding: .5rem 0; }
+
+.todos-table td, .todos-table th { vertical-align: middle; }
+
+@media (max-width: 768px) {
+  .todos-table thead { display: none; }
+  .todos-table, .todos-table tbody, .todos-table tr, .todos-table td { display: block; width: 100%; }
+  .todos-table tr { margin-bottom: 1rem; border: 1px solid rgba(0,0,0,.04); padding: .75rem; border-radius: 8px; }
+  .todos-table td { padding: .25rem .5rem; }
+  .todos-table td:before { content: attr(data-label); font-weight: 600; display: block; }
 }
