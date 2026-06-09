@@ -8,22 +8,85 @@
   <div class="col-12 col-md-8">
     <h1 class="h4 mb-3">{% if form.instance and form.instance.pk %}Edit Todo{% else %}Create Todo{% endif %}</h1>
 
-    <form method="post" novalidate>
+    <form method="post" novalidate id="todo-form">
       {% csrf_token %}
-      {% for field in form %}
+
+      {% comment %} Title {% endcomment %}
+      {% if 'title' in form.fields %}
         <div class="mb-3">
-          <label for="{{ field.id_for_label }}" class="form-label fw-semibold">
-            {{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}
+          <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold">
+            {{ form.title.label }}{% if form.title.field.required %} <span class="text-danger">*</span>{% endif %}
           </label>
-          {{ field }}
-          {% if field.help_text %}
-            <div class="form-text">{{ field.help_text }}</div>
+          {{ form.title }}
+          {% if form.title.help_text %}
+            <div class="form-text">{{ form.title.help_text }}</div>
           {% endif %}
-          {% for error in field.errors %}
+          {% for error in form.title.errors %}
             <div class="invalid-feedback d-block">{{ error }}</div>
           {% endfor %}
         </div>
-      {% endfor %}
+      {% endif %}
+
+      {% comment %} Description {% endcomment %}
+      {% if 'description' in form.fields %}
+        <div class="mb-3">
+          <label for="{{ form.description.id_for_label }}" class="form-label fw-semibold">
+            {{ form.description.label }}{% if form.description.field.required %} <span class="text-danger">*</span>{% endif %}
+          </label>
+          {{ form.description }}
+          {% if form.description.help_text %}
+            <div class="form-text">{{ form.description.help_text }}</div>
+          {% endif %}
+          {% for error in form.description.errors %}
+            <div class="invalid-feedback d-block">{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% comment %} Due date (optional) {% endcomment %}
+      {% if 'due_date' in form.fields %}
+        <div class="mb-3">
+          <label for="{{ form.due_date.id_for_label }}" class="form-label fw-semibold">
+            {{ form.due_date.label }}{% if form.due_date.field.required %} <span class="text-danger">*</span>{% endif %}
+          </label>
+          {{ form.due_date }}
+          {% if form.due_date.help_text %}
+            <div class="form-text">{{ form.due_date.help_text }}</div>
+          {% endif %}
+          {% for error in form.due_date.errors %}
+            <div class="invalid-feedback d-block">{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% comment %} Priority (optional) {% endcomment %}
+      {% if 'priority' in form.fields %}
+        <div class="mb-3">
+          <label for="{{ form.priority.id_for_label }}" class="form-label fw-semibold">
+            {{ form.priority.label }}{% if form.priority.field.required %} <span class="text-danger">*</span>{% endif %}
+          </label>
+          {{ form.priority }}
+          {% if form.priority.help_text %}
+            <div class="form-text">{{ form.priority.help_text }}</div>
+          {% endif %}
+          {% for error in form.priority.errors %}
+            <div class="invalid-feedback d-block">{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% comment %} Completed checkbox {% endcomment %}
+      {% if 'completed' in form.fields %}
+        <div class="mb-3 form-check">
+          {{ form.completed }}
+          <label for="{{ form.completed.id_for_label }}" class="form-check-label">
+            {{ form.completed.label }}
+          </label>
+          {% for error in form.completed.errors %}
+            <div class="invalid-feedback d-block">{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
 
       <div class="d-flex gap-2">
         <button type="submit" class="btn btn-primary">Save</button>
@@ -32,4 +95,8 @@
     </form>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/todos.js' %}"></script>
 {% endblock %}

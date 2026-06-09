@@ -25,7 +25,7 @@ class TodoListView(ListView):
     ordering = ["-created_at"]
 
     def get_queryset(self) -> Any:
-        return Todo.objects.all()
+        return services.get_all_todos()
 
 
 class TodoCreateView(CreateView):
@@ -66,7 +66,3 @@ class TodoViewSet(viewsets.ModelViewSet):
         if user and user.is_authenticated:
             return Todo.objects.all()
         return Todo.objects.none()
-
-    def perform_create(self, serializer: Any) -> None:
-        # No user relation to set; directly save the instance.
-        serializer.save()

@@ -9,6 +9,34 @@
   <a href="{% url 'todos:create' %}" class="btn btn-primary">Create Todo</a>
 </div>
 
+<div class="mb-3">
+  <form id="todo-filters" method="get" class="row g-2 align-items-center">
+    <div class="col-auto">
+      <label for="filter-priority" class="form-label small mb-0">Priority</label>
+      <select id="filter-priority" name="priority" class="form-select form-select-sm">
+        <option value="">All</option>
+        <option value="high" {% if request.GET.priority == 'high' %}selected{% endif %}>High</option>
+        <option value="medium" {% if request.GET.priority == 'medium' %}selected{% endif %}>Medium</option>
+        <option value="low" {% if request.GET.priority == 'low' %}selected{% endif %}>Low</option>
+      </select>
+    </div>
+
+    <div class="col-auto">
+      <label for="filter-status" class="form-label small mb-0">Status</label>
+      <select id="filter-status" name="status" class="form-select form-select-sm">
+        <option value="">All</option>
+        <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+        <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+      </select>
+    </div>
+
+    <div class="col-auto d-flex align-items-end">
+      <button type="submit" class="btn btn-sm btn-outline-secondary">Apply</button>
+      <a href="{% url 'todos:list' %}" class="btn btn-sm btn-link">Reset</a>
+    </div>
+  </form>
+</div>
+
 {% if todos %}
   <div class="row gy-3">
     {% for todo in todos %}
@@ -19,8 +47,17 @@
               <div>
                 <h5 class="card-title mb-1">{{ todo.title }}</h5>
                 {% if todo.description %}
-                  <p class="card-text text-muted small mb-0">{{ todo.description }}</p>
+                  <p class="card-text text-muted small mb-1">{{ todo.description }}</p>
                 {% endif %}
+
+                <div class="small text-muted">
+                  {% if todo.due_date %}
+                    Due: {{ todo.due_date|date:"Y-m-d" }}
+                  {% else %}
+                    &nbsp;
+                  {% endif %}
+                </div>
+
               </div>
               <div class="text-end">
                 {% if todo.completed %}
@@ -31,8 +68,18 @@
               </div>
             </div>
 
-            <div class="mt-3 d-flex justify-content-between align-items-center">
-              <small class="text-muted">Created: {{ todo.created_at|date:"Y-m-d H:i" }}</small>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <div>
+                {% if todo.priority == 'high' %}
+                  <span class="badge bg-danger">High</span>
+                {% elif todo.priority == 'medium' %}
+                  <span class="badge bg-warning text-dark">Medium</span>
+                {% elif todo.priority == 'low' %}
+                  <span class="badge bg-info text-dark">Low</span>
+                {% else %}
+                  <span class="badge bg-light text-muted">No priority</span>
+                {% endif %}
+              </div>
 
               <div class="btn-group">
                 <form method="post" action="{% url 'todos:toggle' todo.pk %}" style="display:inline">
@@ -54,4 +101,8 @@
   </div>
 {% endif %}
 
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/todos.js' %}"></script>
 {% endblock %}
