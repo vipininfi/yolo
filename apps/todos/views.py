@@ -1,11 +1,13 @@
-from typing import Any
+from typing import Optional, Any
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.views import View
 from django.http import HttpRequest, HttpResponse
 from django.urls import reverse_lazy
+from django.db.models.query import QuerySet
 from apps.todos.models import Todo
 from apps.todos.forms import TodoForm
+from apps.todos.services import get_all_todos
 from apps.todos import services
 
 # DRF imports
@@ -24,8 +26,21 @@ class TodoListView(ListView):
     context_object_name = "todos"
     ordering = ["-created_at"]
 
-    def get_queryset(self) -> Any:
-        return Todo.objects.all()
+    def get_queryset(self) -> QuerySet:
+        q: Optional[str] = self.request.GET.get("q")
+        completed_raw: Optional[str] = self.request.GET.get("completed")
+
+        completed: Optional[bool]
+        if completed_raw is None or completed_raw.lower() == "all":
+            completed = None
+        elif completed_raw.lower() in {"true", "1"}:
+            completed = True
+        elif completed_raw.lower() in {"false", "0"}:
+            completed = False
+        else:
+            completed = None
+
+        return get_all_todos(q=q, completed=completed)
 
 
 class TodoCreateView(CreateView):
@@ -66,7 +81,3 @@ class TodoViewSet(viewsets.ModelViewSet):
         if user and user.is_authenticated:
             return Todo.objects.all()
         return Todo.objects.none()
-
-    def perform_create(self, serializer: Any) -> None:
-        # No user relation to set; directly save the instance.
-        serializer.save()
