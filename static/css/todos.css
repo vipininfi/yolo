@@ -1,0 +1,22 @@
+/* ── Todos styles ─────────────────────────────── */
+:root {
+  --radius: 10px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.06);
+}
+
+.todo-card {
+  border-radius: var(--radius);
+  border: 1px solid rgba(0,0,0,.06);
+  transition: box-shadow .18s ease, transform .12s ease;
+}
+.todo-card:hover {
+  box-shadow: 0 6px 18px rgba(0,0,0,.06);
+  transform: translateY(-2px);
+}
+
+.badge-completed { background-color: #198754; }
+.empty-state { text-align: center; padding: 2.5rem 1rem; color: #6c757d; }
+
+@media (max-width: 576px) {
+  .todo-card { padding: .75rem; }
+}
