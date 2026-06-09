@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Todos Home{% endblock %}
+
+{% block content %}
+<div class="py-4">
+  <h1 class="mb-3">Todos</h1>
+  <p class="lead text-muted">Manage your tasks and stay organized.</p>
+  <a href="{% url 'todos:todo_list' %}" class="btn btn-primary">View To-Do List</a>
+</div>
+{% endblock %}
