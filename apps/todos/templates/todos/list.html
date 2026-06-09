@@ -3,37 +3,106 @@
 
 {% block title %}To-Do List{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/todos.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
-  <h1 class="h3 mb-0">To-Do List</h1>
-  <a href="{% url 'todos:create' %}" class="btn btn-primary">Create Todo</a>
+  <div>
+    <h1 class="h3 mb-0">To-Do List</h1>
+    <p class="text-muted small mb-0">Manage your tasks — search, filter and perform bulk actions.</p>
+  </div>
+  <div>
+    <a href="{% url 'todos:create' %}" class="btn btn-primary">Create Todo</a>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <form method="get" class="row g-2 align-items-center">
+      <div class="col-auto">
+        <label for="id_q" class="visually-hidden">Search</label>
+        <input id="id_q" name="q" value="{{ request.GET.q|default_if_none:'' }}" class="form-control" placeholder="Search todos" />
+      </div>
+      <div class="col-auto">
+        <label for="id_priority" class="visually-hidden">Priority</label>
+        <select id="id_priority" name="priority" class="form-select">
+          <option value="">All priorities</option>
+          <option value="1" {% if request.GET.priority == '1' %}selected{% endif %}>High</option>
+          <option value="2" {% if request.GET.priority == '2' %}selected{% endif %}>Normal</option>
+          <option value="3" {% if request.GET.priority == '3' %}selected{% endif %}>Low</option>
+        </select>
+      </div>
+      <div class="col-auto">
+        <label for="id_due_before" class="visually-hidden">Due before</label>
+        <input id="id_due_before" type="date" name="due_before" value="{{ request.GET.due_before|default_if_none:'' }}" class="form-control" />
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-outline-primary">Filter</button>
+        <a href="{% url 'todos:list' %}" class="btn btn-outline-secondary">Clear</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="bulk-toolbar mb-3 d-flex gap-2 align-items-center">
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" id="select-all">
+    <label class="form-check-label" for="select-all">Select all</label>
+  </div>
+  <button id="bulk-toggle-btn" class="btn btn-sm btn-warning" disabled>Bulk Toggle Complete</button>
+  <div class="text-muted small">Selected: <span id="bulk-selected-count">0</span></div>
 </div>
 
 {% if todos %}
-  <div class="row gy-3">
-    {% for todo in todos %}
-      <div class="col-12 col-md-6">
-        <div class="card todo-card">
-          <div class="card-body d-flex flex-column">
-            <div class="d-flex justify-content-between align-items-start mb-2">
-              <div>
-                <h5 class="card-title mb-1">{{ todo.title }}</h5>
-                {% if todo.description %}
-                  <p class="card-text text-muted small mb-0">{{ todo.description }}</p>
-                {% endif %}
-              </div>
-              <div class="text-end">
-                {% if todo.completed %}
-                  <span class="badge bg-success">Completed</span>
-                {% else %}
-                  <span class="badge bg-secondary">Pending</span>
-                {% endif %}
-              </div>
-            </div>
-
-            <div class="mt-3 d-flex justify-content-between align-items-center">
-              <small class="text-muted">Created: {{ todo.created_at|date:"Y-m-d H:i" }}</small>
-
+  <div class="table-responsive">
+    <table class="table table-hover align-middle todos-table">
+      <thead>
+        <tr>
+          <th scope="col"></th>
+          <th scope="col">Title</th>
+          <th scope="col">Description</th>
+          <th scope="col">Priority</th>
+          <th scope="col">Due</th>
+          <th scope="col">Status</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for todo in todos %}
+          <tr class="todo-row" data-todo-id="{{ todo.pk }}" data-due="{{ todo.due_date|default:'' }}">
+            <td>
+              <input type="checkbox" class="form-check-input select-todo" aria-label="Select todo {{ todo.title }}" data-id="{{ todo.pk }}">
+            </td>
+            <td>{{ todo.title }}</td>
+            <td class="text-muted small">{{ todo.description|default:'' }}</td>
+            <td>
+              {% if todo.priority == 1 %}
+                <span class="badge badge-priority-high">High</span>
+              {% elif todo.priority == 2 %}
+                <span class="badge badge-priority-normal">Normal</span>
+              {% elif todo.priority == 3 %}
+                <span class="badge badge-priority-low">Low</span>
+              {% else %}
+                <span class="badge bg-secondary">-</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if todo.due_date %}
+                <time datetime="{{ todo.due_date }}">{{ todo.due_date }}</time>
+              {% else %}
+                —
+              {% endif %}
+            </td>
+            <td>
+              {% if todo.completed %}
+                <span class="badge bg-success">Completed</span>
+              {% else %}
+                <span class="badge bg-secondary">Pending</span>
+              {% endif %}
+            </td>
+            <td>
               <div class="btn-group">
                 <form method="post" action="{% url 'todos:toggle' todo.pk %}" style="display:inline">
                   {% csrf_token %}
@@ -42,11 +111,11 @@
                 <a href="{% url 'todos:update' todo.pk %}" class="btn btn-outline-primary btn-sm">Edit</a>
                 <a href="{% url 'todos:delete' todo.pk %}" class="btn btn-outline-danger btn-sm">Delete</a>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    {% endfor %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 {% else %}
   <div class="empty-state mt-4">
@@ -54,4 +123,27 @@
   </div>
 {% endif %}
 
+{% if is_paginated %}
+  <nav aria-label="Page navigation">
+    <ul class="pagination">
+      {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Previous</span></li>
+      {% endif %}
+      <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+      {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Next</span></li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/todos.js' %}"></script>
+<script>document.addEventListener('DOMContentLoaded', initTodosPage);</script>
 {% endblock %}
