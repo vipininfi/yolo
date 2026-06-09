@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Home — To-Do App{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <h1 class="h3 mb-4">Welcome</h1>
+    <p class="text-muted">This is the home page for the project.</p>
+    <a href="{% url 'todos:todo-list' %}" class="btn btn-primary">Go to To-Do List</a>
+  </div>
+</div>
+{% endblock %}

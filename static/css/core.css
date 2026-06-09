@@ -1,0 +1,21 @@
+/* App styles */
+:root{
+  --color-primary: #0d6efd;
+  --radius: 8px;
+}
+
+body { background: #f8f9fa; color: #212529; }
+
+/* To-do list styles */
+.todo-card { border-radius: 10px; border: 1px solid #e9ecef; background: #fff; }
+.todo-card + .todo-card { margin-top: .75rem; }
+.todo-title { margin: 0; font-weight: 600; }
+.todo-completed .todo-title, .todo-completed .todo-desc { text-decoration: line-through; opacity: 0.7; }
+.todo-meta { font-size: .875rem; color: #6c757d; }
+.todo-actions .btn { margin-left: .35rem; }
+
+.empty-state { text-align: center; padding: 2rem; color: #6c757d; }
+
+@media (max-width: 576px) {
+  .todo-actions { display: flex; gap: .5rem; margin-top: .5rem; }
+}

@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}To-Do List{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h4 mb-0">To-Do List</h1>
+  <a href="{% url 'todos:todo-create' %}" class="btn btn-primary">New To-Do</a>
+</div>
+
+{% comment %} Support both `todos` and default `object_list` context variables {% endcomment %}
+{% if todos %}
+  {% for todo in todos %}
+    <div class="card todo-card p-3 {% if todo.completed %}todo-completed{% endif %}">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <h5 class="todo-title">{{ todo.title }}</h5>
+          {% if todo.description %}<p class="mb-1 todo-desc text-muted">{{ todo.description }}</p>{% endif %}
+          <div class="todo-meta">Created: {{ todo.created_at|date:"Y-m-d H:i" }}</div>
+        </div>
+        <div class="text-end todo-actions">
+          {% if todo.completed %}
+            <span class="badge bg-success me-2">Completed</span>
+          {% else %}
+            <span class="badge bg-secondary me-2">Open</span>
+          {% endif %}
+
+          <form method="post" action="{% url 'todos:todo-toggle' todo.pk %}" class="d-inline">
+            {% csrf_token %}
+            {% if todo.completed %}
+              <button type="submit" class="btn btn-outline-warning btn-sm">Mark incomplete</button>
+            {% else %}
+              <button type="submit" class="btn btn-outline-success btn-sm">Mark complete</button>
+            {% endif %}
+          </form>
+
+          <a href="{% url 'todos:todo-update' todo.pk %}" class="btn btn-outline-primary btn-sm">Edit</a>
+          <a href="{% url 'todos:todo-delete' todo.pk %}" class="btn btn-outline-danger btn-sm">Delete</a>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <div class="alert alert-info">No todos yet. <a href="{% url 'todos:todo-create' %}">Create one</a>.</div>
+  {% endfor %}
+
+{% elif object_list %}
+  {% for todo in object_list %}
+    <div class="card todo-card p-3 {% if todo.completed %}todo-completed{% endif %}">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <h5 class="todo-title">{{ todo.title }}</h5>
+          {% if todo.description %}<p class="mb-1 todo-desc text-muted">{{ todo.description }}</p>{% endif %}
+          <div class="todo-meta">Created: {{ todo.created_at|date:"Y-m-d H:i" }}</div>
+        </div>
+        <div class="text-end todo-actions">
+          {% if todo.completed %}
+            <span class="badge bg-success me-2">Completed</span>
+          {% else %}
+            <span class="badge bg-secondary me-2">Open</span>
+          {% endif %}
+
+          <form method="post" action="{% url 'todos:todo-toggle' todo.pk %}" class="d-inline">
+            {% csrf_token %}
+            {% if todo.completed %}
+              <button type="submit" class="btn btn-outline-warning btn-sm">Mark incomplete</button>
+            {% else %}
+              <button type="submit" class="btn btn-outline-success btn-sm">Mark complete</button>
+            {% endif %}
+          </form>
+
+          <a href="{% url 'todos:todo-update' todo.pk %}" class="btn btn-outline-primary btn-sm">Edit</a>
+          <a href="{% url 'todos:todo-delete' todo.pk %}" class="btn btn-outline-danger btn-sm">Delete</a>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <div class="alert alert-info">No todos yet. <a href="{% url 'todos:todo-create' %}">Create one</a>.</div>
+  {% endfor %}
+
+{% else %}
+  <div class="empty-state">
+    <p class="mb-3">No todos to show.</p>
+    <a href="{% url 'todos:todo-create' %}" class="btn btn-primary">Create first to-do</a>
+  </div>
+{% endif %}
+
+{% endblock %}
